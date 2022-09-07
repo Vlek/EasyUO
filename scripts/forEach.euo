@@ -1,0 +1,72 @@
+; forEach subroutine
+;
+; This creates a way to have collections 
+
+
+sub forEach
+    ; Arguments:
+    ;   collection: A seperator deliniated collection
+    ;   subroutine: The subroutine to call and pass substrings
+    ;   seperator: The single character separating items
+
+    ; rename input values to friendly names
+    set %collection %1
+    set %subroutineToCall %2
+    set %seperator %3
+    
+    ; Derived variables that are needed
+    str Len %collection
+    set %collectionStringLength #strRes
+
+    ; If a seperator variable was not passed, default
+    if %seperator = N/A
+    {
+      set %seperator |
+    }
+    
+    str count %collection %seperator
+    set %num_seperators #strRes + 1
+    
+    set %cur_index 1
+
+    ; For each substring between seperators, pass to subroutine
+    for %i 1 %num_seperators
+    {
+       ; Get the position of the next seperator
+       str pos %collection %seperator %i
+       set %next_seperator_pos #strRes
+       
+       if %next_seperator_pos = 0
+       {
+           if %collectionStringLength <= %cur_index
+           {
+               return
+           }
+
+           set %next_seperator_pos %collectionStringLength + 1
+       }
+       
+       ; Get the length between seperators
+       set %length %next_seperator_pos - %cur_index
+       
+       ; Get the substring
+       str Mid %collection %cur_index %length
+
+       ; Set the substring
+       set %substring #strRes
+       
+       ; Pass the substring to the subroutine callback
+       gosub %subroutineToCall %substring
+       set %cur_index %next_seperator_pos + 1
+    }
+return
+
+sub helloWorld
+    event sysMessage Hello, %1 !
+return
+
+set %ore_types 19BA|19B7|19B8|19B9
+
+gosub forEach %ore_types helloWorld
+
+halt

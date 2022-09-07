@@ -254,5 +254,3 @@ Sub-commands:
 - Count [string] [substring]
   - Returns the number of occurences of substring in string.
 
-
-
